@@ -15,8 +15,8 @@
 #define RST_PIN 9
 #define SS_PIN 10
 
-const char* ssid = "your_SSID";         
-const char* password = "your_PASSWORD"; 
+const char* ssid = "your_SSID";
+const char* password = "your_PASSWORD";
 const char* iftttKey = "your_IFTTT_KEY";
 
 Servo gateServo;
