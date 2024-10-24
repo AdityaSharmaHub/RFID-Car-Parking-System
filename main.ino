@@ -52,7 +52,7 @@ User users[3] = {
   {"14DB8A7", "Aditya", 50.0},  // User 1: Aditya
   {"3B5A7111", "Vishnu", 300.0},    // User 2: Vishnu
   {"EEEEEEEE", "Prachiti", 100.0} // User 3: Prachiti
-  {"ABCDEFGH", "Rahul", 100.0} 
+  {"ABCDEFGH", "Rahul", 100.0} // User 4: Rahul
 };
 
 User *currentUser = nullptr;  // Pointer to store current user after RFID scan
