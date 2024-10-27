@@ -12,12 +12,12 @@ MFRC522 rfid(SS_PIN, RST_PIN);  // Create instance of RFID
 
 // Servo motor for barrier
 Servo barrierServo;
-#define SERVO_PIN A3  // Servo connected to pin A3
+#define SERVO_PIN 3  // Servo connected to pin A3
 
 // IR Sensors
-#define IR_ENTRY A0     // Entry IR sensor before barrier
-#define IR_EXIT A1      // Exit IR sensor after barrier
-#define IR_SLOT_1 A2    // IR sensor for Parking Slot 1
+#define IR_ENTRY 2     // Entry IR sensor before barrier
+#define IR_EXIT 4      // Exit IR sensor after barrier
+#define IR_SLOT_1 5    // IR sensor for Parking Slot 1
 
 // LCD Display
 LiquidCrystal_I2C lcd(0x27, 16, 2);  // Set LCD address to 0x27 for a 16 chars and 2 line display
@@ -31,8 +31,8 @@ char keys[ROWS][COLS] = {
   {'7', '8', '9', 'C'},
   {'*', '0', '#', 'D'}
 };
-byte rowPins[ROWS] = {2, 3, 4, 5};  // Row pins
-byte colPins[COLS] = {6, 7, 8, 9};  // Column pins
+byte rowPins[ROWS] = {A0, A1, A2, A3};  // Row pins
+byte colPins[COLS] = {6, 7, 8, A6};  // Column pins
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 // Parking fee settings
@@ -49,10 +49,9 @@ struct User {
 
 // Array of 3 users
 User users[3] = {
-  {"14DB8A7", "Aditya", 50.0},  // User 1: Aditya
+  {"14DB8A7", "Aditya", 10.0},  // User 1: Aditya
   {"3B5A7111", "Vishnu", 300.0},    // User 2: Vishnu
-  {"EEEEEEEE", "Prachiti", 100.0} // User 3: Prachiti
-  {"ABCDEFGH", "Rahul", 100.0} // User 4: Rahul
+  {"2BD46D3C", "Prachiti", 100.0} // User 3: Prachiti
 };
 
 User *currentUser = nullptr;  // Pointer to store current user after RFID scan
@@ -124,8 +123,8 @@ void loop() {
 
       if (currentUser->balance >= fee) {
         deductFee(fee);  // Deduct fee from card balance
-        thankUser();  // Display thank you message
         openBarrier();
+        thankUser();  // Display thank you message
         leaveParking();
       } else {
         promptRecharge(fee);  // Prompt user to recharge if balance is low
@@ -136,9 +135,6 @@ void loop() {
 
 // Function to check RFID card
 bool checkRFIDCard() {
-  Serial.println(cardUID);
-  Serial.println(currentUser);
-  Serial.println(carParked);
   if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {
     // cardScanned = true;
     String cardUID = "";
@@ -156,7 +152,7 @@ bool checkRFIDCard() {
         if (!carParked) {
           lcd.clear();
           lcd.setCursor(0, 0);
-          lcd.print("Welcome, " + currentUser->name);
+          lcd.print("Welcome " + currentUser->name);
           delay(1000);
         }
         return true;
@@ -184,7 +180,7 @@ void openBarrier() {
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Barrier Closed");
-  delay(1000);
+  delay(2000);
 }
 
 // Function to park the car
@@ -289,7 +285,7 @@ void promptRecharge(float fee) {
         lcd.setCursor(0, 1);
         lcd.print(enteredAmount);
         currentUser->balance += enteredAmount;  // Update balance
-        delay(3000);
+        delay(2000);
         break;
       } else if (key >= '0' && key <= '9') {
         enteredAmount = (enteredAmount * 10) + (key - '0');  // Append digit to amount
@@ -310,8 +306,8 @@ void promptRecharge(float fee) {
   // Check if balance is enough to deduct the fee after recharge
   if (currentUser->balance >= fee) {
     deductFee(fee);  // Deduct fee from card balance
-    thankUser();     // Display thank you message
     openBarrier();   // Open the barrier
+    thankUser();     // Display thank you message
     leaveParking();  // Car leaves the parking
   } else {
     lcd.clear();
